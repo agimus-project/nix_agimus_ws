@@ -29,15 +29,15 @@
               default = pkgs.mkShell {
                 name = "AGIMUS Main Dev Shell no ros";
                 shellHook = ''
-                  export PYTHONPATH=${pkgs.python3.withPackages (p: [
+                  export PYTHONPATH=${pkgs.python310.withPackages (p: [
                     p.gepetto-gui
                     p.hpp-corba
                     p.crocoddyl
                     p.example-robot-data
                     p.mim-solvers
                     p.pinocchio
-                  ])}/${pkgs.python3.sitePackages}:$PYTHONPATH
-                  export LD_LIBRARY_PATH=${pkgs.python3.withPackages (p: [
+                  ])}/${pkgs.python310.sitePackages}:$PYTHONPATH
+                  export LD_LIBRARY_PATH=${pkgs.python310.withPackages (p: [
                     p.gepetto-gui
                     p.hpp-corba
                     p.crocoddyl
@@ -48,7 +48,7 @@
                 '';
                 packages = [
                   # keep-sorted start  
-                  (pkgs.python3.withPackages (p: [
+                  (pkgs.python310.withPackages (p: [
                     p.gepetto-gui
                     p.hpp-corba
                     p.crocoddyl
