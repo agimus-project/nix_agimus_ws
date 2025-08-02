@@ -16,7 +16,35 @@
     inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import inputs.systems;
-      imports = [ inputs.gepetto.flakeModule ];
+      imports = [
+        inputs.gepetto.flakeModule
+        {
+          gepetto-pkgs.overlays = [
+            (final: prev: {
+              # Overlay for system-wide pybind11
+              pybind11 = prev.pybind11.overrideAttrs (oldAttrs: {
+                doCheck = false;
+                doInstallCheck = false;
+                doBenchmark = false;
+                cmakeFlags = (oldAttrs.cmakeFlags or []) ++ [ "-DPYBIND11_TEST=OFF" ];
+              });
+              # Extension for python310's pythonPackages
+              pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+                (
+                  python-final: python-prev: {
+                    pybind11 = python-prev.pybind11.overridePythonAttrs (oldAttrs: {
+                      doCheck = false;
+                      doInstallCheck = false;
+                      doBenchmark = false;
+                      cmakeFlags = (oldAttrs.cmakeFlags or []) ++ [ "-DPYBIND11_TEST=OFF" ];
+                    });
+                  }
+                )
+              ];
+            })
+          ];
+        }
+      ];
       perSystem =
         {
           lib,
@@ -25,6 +53,9 @@
           ...
         }:
         {
+          packages = {
+            pybind11 = pkgs.python310.withPackages (p: [ p.pybind11 ]);
+          };
           devShells = {
               default = pkgs.mkShell {
                 name = "AGIMUS Main Dev Shell no ros";
@@ -49,6 +80,7 @@
                 packages = [
                   # keep-sorted start  
                   (pkgs.python310.withPackages (p: [
+                    p.pybind11
                     p.gepetto-gui
                     p.hpp-corba
                     p.crocoddyl
