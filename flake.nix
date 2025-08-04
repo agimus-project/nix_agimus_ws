@@ -62,31 +62,22 @@
                 shellHook = ''
                   export PYTHONPATH=${pkgs.python310.withPackages (p: [
                     p.gepetto-gui
-                    p.hpp-corba
-                    p.crocoddyl
-                    p.example-robot-data
-                    p.mim-solvers
-                    p.pinocchio
-                  ])}/${pkgs.python310.sitePackages}:$PYTHONPATH
+                  ])}/${pkgs.python310.sitePackages}:$PYTHONPATH:/usr/local/lib/python3/dist-packages:/usr/lib/python3/dist-packages
                   export LD_LIBRARY_PATH=${pkgs.python310.withPackages (p: [
                     p.gepetto-gui
-                    p.hpp-corba
-                    p.crocoddyl
-                    p.example-robot-data
-                    p.mim-solvers
-                    p.pinocchio
                   ])}/lib:$LD_LIBRARY_PATH
                 '';
                 packages = [
                   # keep-sorted start  
                   (pkgs.python310.withPackages (p: [
-                    p.pybind11
-                    p.gepetto-gui
-                    p.hpp-corba
+                    p.colmpc
                     p.crocoddyl
                     p.example-robot-data
+                    p.gepetto-gui
+                    p.hpp-corba
                     p.mim-solvers
                     p.pinocchio
+                    p.pybind11
                   ]))
                   # keep-sorted end
                 ];
