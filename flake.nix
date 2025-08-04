@@ -1,5 +1,5 @@
 {
-  description = "CHANGEME";
+  description = "Agimus environment";
 
   inputs = {
     gepetto.url = "github:nim65s/gepetto-nix/gz";
@@ -25,90 +25,58 @@
         }:
         {
           devShells = {
-              default = pkgs.mkShell {
-                name = "Gepetto Main Dev Shell";
-                CMAKE_C_COMPILER_LAUNCHER = "ccache";
-                CMAKE_CXX_COMPILER_LAUNCHER = "ccache";
-                CMAKE_GENERATOR = "Unix Makefiles";
-                ROS_PACKAGE_PATH = "${pkgs.example-robot-data}/share";
-                shellHook = ''
-                  export DEVEL_HPP_DIR=$(pwd -P)
-                  mkdir -p $DEVEL_HPP_DIR/{src,install}
-                  export INSTALL_HPP_DIR=$DEVEL_HPP_DIR/install
-                  export PATH=$INSTALL_HPP_DIR/bin:$PATH
-                  export LD_LIBRARY_PATH=$INSTALL_HPP_DIR/lib
-                  export PYTHONPATH=$INSTALL_HPP_DIR/${pkgs.python3.sitePackages}
-                  export GEPETTO_GUI_PLUGIN_DIRS=$INSTALL_HPP_DIR/lib/gepetto-gui-plugins
-                  export HPP_PLUGIN_DIRS=$INSTALL_HPP_DIR/lib/hppPlugins
-                '';
-                packages =
-                  with pkgs;
-                  [
-                    (
-                      buildEnv {
-                        name = "ros";
-                        paths = [
-                          # keep-sorted start
-                          pkgs.python3Packages.example-robot-data # for availability in AMENT_PREFIX_PATH
-                          pkgs.python3Packages.hpp-tutorial # for availability in AMENT_PREFIX_PATH
-                          pkgs.rosPackages.humble.ros-core
-                          # pkgs.rosPackages.humble.turtlesim
-                          pkgs.rosPackages.humble.agimus-controller-ros
-                          pkgs.rosPackages.humble.agimus-msgs
-                          # keep-sorted end
-                        ];
-                      }
-                    )
-                    gz-harmonic
-                    colcon
-                    assimp
-                    ccache
-                    cddlib
-                    clp
-                    cmake
-                    console-bridge
-                    doxygen
-                    eigen
-                    glpk
-                    graphviz
-                    jrl-cmakemodules
-                    libGL
-                    libsForQt5.full
-                    octomap
-                    openscenegraph
-                    osgqt
-                    pkg-config
-                    (python3.withPackages (
-                      p: with p; [
-                        lxml
-                        numpy
-                        omniorb
-                        omniorbpy
-                        python-qt
-                        scipy
-                        (toPythonModule rosPackages.rolling.xacro)
-                        # keep-sorted start
-                        agimus-controller
-                        agimus-controller-examples
-                        crocoddyl
-                        gepetto-gui
-                        hpp-corba
-                        ipython
-                        matplotlib
-                        # keep-sorted end
-                      ]
-                    ))
-                    python3Packages.boost
-                    qhull
-                    qpoases
-                    tinyxml-2
-                    urdfdom
-                    zlib
-                  ]
-                  ++ lib.optionals stdenv.isLinux [
-                    psmisc
-                  ];
-              };
+            default = pkgs.mkShell {
+              name = "Agimus Dev Shell";
+              
+              buildInputs = [
+                # Outils de compilation C++ et ROS
+                pkgs.cmake
+                pkgs.ccache
+
+                # gazebo
+                pkgs.gz-harmonic
+
+                # Paquets ROS 2 de base
+                pkgs.rosPackages.humble.ros-core
+                pkgs.rosPackages.humble.ament-cmake-auto
+                pkgs.rosPackages.humble.ament-cmake-python
+                pkgs.rosPackages.humble.ament-cmake
+                # pkgs.rosPackages.humble.ament-package
+                # Ajoutez ici les autres paquets ROS 2 dont vous dépendez (ex: pkgs.rosPackages.humble.rclcpp)
+                pkgs.rosPackages.humble.generate-parameter-library
+                pkgs.rosPackages.humble.generate-parameter-library-py
+                pkgs.rosPackages.humble.controller-manager
+                pkgs.rosPackages.humble.linear-feedback-controller-msgs
+                pkgs.rosPackages.humble.linear-feedback-controller
+
+                # Franka packages
+                pkgs.rosPackages.humble.franka-ros2 # beugué !
+                # pkgs.rosPackages.humble.franka-description
+                # pkgs.rosPackages.humble.franka-gripper
+                # pkgs.rosPackages.humble.franka-hardware
+                # pkgs.rosPackages.humble.franka-ign-ros2-control # beugué !
+                # pkgs.rosPackages.humble.franka-robot-state-broadcaster
+                # pkgs.rosPackages.humble.gripper-controllers
+
+                # other packages
+                pkgs.rosPackages.humble.eigen3-cmake-module
+
+                (pkgs.python3.withPackages (p: [
+                  p.gepetto-gui
+                  p.hpp-corba
+                  p.crocoddyl
+                  p.example-robot-data
+                  p.mim-solvers
+                  p.pinocchio
+                  p.jinja2
+                  # p.setuptools # needed to build franka dependancies
+                ]))
+              ];
+
+              shellHook = ''
+                echo "Bienvenue dans l'environnement de développement Agimus !"
+              '';
+            };
           };
         };
     };
